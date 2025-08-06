@@ -1,0 +1,44 @@
+name: Lint and check formatting with ruff
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  format-and-test:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Check code formatting 
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check --diff
+
+      - name: Lint
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check
+
+      - name: Run tests
+        run: uv run pytest tests

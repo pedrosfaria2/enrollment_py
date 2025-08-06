@@ -1,0 +1,46 @@
+# dagster
+.tmp_dagster*
+*.duckdb
+
+# parquet from pipelines
+*.parquet
+
+# .scratch space
+.scratch
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# VSCode
+.vscode
+
+# Pycharm
+.idea
+
+# Env variables
+.env
+
+# pytype
+.pytype
+
+# pytest
+.pytest_cache
+.coverage
+htmlcov
+
+# ruff
+.ruff_cache
+
+# mypy
+.mypy_cache
+
+# hypothesis
+.hypothesis

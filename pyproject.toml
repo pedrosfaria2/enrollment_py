@@ -1,0 +1,55 @@
+[project]
+name = "project_name"
+version = "0.1.0"
+description = "Project Description"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+]
+
+[dependency-groups]
+dev = [
+  "approvaltests>=14.5.0",
+  "mypy>=1.15.0",
+  "pre-commit>=4.2.0",
+  "pre-commit-uv>=4.1.4",
+  "pyfakefs>=5.8.0",
+  "pytest>=8.3.5",
+  "pytest-approvaltests>=0.2.4",
+  "pytest-cov>=6.1.1",
+  "pytype>=2024.10.11 ; sys_platform == 'linux'",
+  "ruff>=0.11.5",
+  "sqlfluff>=3.3.1",
+]
+
+[tool.pytest.ini_options]
+addopts = "--approvaltests-use-reporter=PythonNative"
+pythonpath = [
+  "src"
+]
+
+[tool.pytype]
+inputs = ['src']
+jobs = 'auto'
+
+[tool.ruff]
+line-length = 120
+include = ["src/**/*.py", "tests/**/*.py", "examples/**/*.py"]
+respect-gitignore = true
+
+[tool.ruff.lint]
+# E501 ignore line length, formatter will fix it.
+# UP038 is deprecated
+# PD901 allow using `df` for dataframe name
+# PLR0913 too many arguments (style matter)
+# PLR0915 too many statements (style matter)
+ignore = ["E501", "UP038", "PD901", "PLR0913", "PLR0915"]
+select = ["E", "F", "B", "I", "N", "Q", "UP", "C4", "ARG", "NPY", "PD", "PERF", "PL"]
+
+[tool.ruff.lint.per-file-ignores]
+# ARG001 and ARG005 ignore unused args due to fixtures.
+# PLR2004 magic numbers
+"tests/**/*.py" = ["ARG001", "ARG002", "ARG005", "PLR2004"]
+
+[tool.black]
+line-length = 120
