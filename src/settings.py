@@ -21,6 +21,7 @@ class Config(BaseSettings):
         default=os.getenv("DB_FILE_PATH", str(PROJECT_ROOT / "suthub_db.json")),
         description="File path for the application's TinyDB database",
     )
+    DB_LOCK_TIMEOUT: int = Field(ge=1, default=10, description="Database lock timeout in seconds")
     RABBITMQ_HOST: str = Field(
         default=os.getenv("RABBITMQ_HOST", "localhost"),
         description="RabbitMQ host",
