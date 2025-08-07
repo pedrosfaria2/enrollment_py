@@ -1,4 +1,0 @@
-[sqlfluff]
-large_file_skip_byte_limit = 0
-max_line_length = 0
-

@@ -1,10 +1,3 @@
-# dagster
-.tmp_dagster*
-*.duckdb
-
-# parquet from pipelines
-*.parquet
-
 # .scratch space
 .scratch
 
@@ -41,6 +34,3 @@ htmlcov
 
 # mypy
 .mypy_cache
-
-# hypothesis
-.hypothesis
