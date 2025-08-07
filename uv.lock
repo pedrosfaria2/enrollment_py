@@ -270,6 +270,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pytz" },
+    { name = "tinydb" },
     { name = "uvicorn" },
 ]
 
@@ -295,6 +296,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-settings", specifier = ">=2.10.1" },
     { name = "pytz", specifier = ">=2025.2" },
+    { name = "tinydb", specifier = ">=4.8.2" },
     { name = "uvicorn", specifier = ">=0.35.0" },
 ]
 
@@ -984,6 +986,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/76/37/1084db985a7bda417f012570f369d18a6b4afbc59bc423908d0219c38188/testfixtures-9.1.0.tar.gz", hash = "sha256:517e9cf353942723533ae1100ca45dd27fe0785c3ad2765075f5cb1cbce01482", size = 88605, upload-time = "2025-07-08T19:30:55.157Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f3/b6/c60e4a39c6bc717e7c08d1428e2bf53e735bbb020563c91d7f272aa552b1/testfixtures-9.1.0-py3-none-any.whl", hash = "sha256:2f4786194cd92b0b2f2f2d29f72346bdd0191baae58532532b7bfcaecd59ba02", size = 106258, upload-time = "2025-07-08T19:30:53.614Z" },
+]
+
+[[package]]
+name = "tinydb"
+version = "4.8.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/79/4af51e2bb214b6ea58f857c51183d92beba85b23f7ba61c983ab3de56c33/tinydb-4.8.2.tar.gz", hash = "sha256:f7dfc39b8d7fda7a1ca62a8dbb449ffd340a117c1206b68c50b1a481fb95181d", size = 32566, upload-time = "2024-10-12T15:24:01.13Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/78/17/853354204e1ca022d6b7d011ca7f3206c4f8faa3cc743e92609b49c1d83f/tinydb-4.8.2-py3-none-any.whl", hash = "sha256:f97030ee5cbc91eeadd1d7af07ab0e48ceb04aa63d4a983adbaca4cba16e86c3", size = 24888, upload-time = "2024-10-12T15:23:59.833Z" },
 ]
 
 [[package]]
