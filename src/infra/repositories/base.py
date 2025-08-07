@@ -5,6 +5,8 @@ from tinydb import Query
 from tinydb.queries import QueryInstance
 from tinydb.table import Document, Table
 
+from infra.common.database_lock import db_lock
+
 
 class BaseRepository[ModelType: BaseModel]:
     """
@@ -40,7 +42,8 @@ class BaseRepository[ModelType: BaseModel]:
 
     def insert(self, entity: ModelType) -> ModelType:
         """Inserts a new entity into the database."""
-        self.table.insert(entity.model_dump())
+        with db_lock:
+            self.table.insert(entity.model_dump())
         return entity
 
     def get_by_id(self, doc_id: int) -> ModelType | None:
@@ -78,13 +81,13 @@ class BaseRepository[ModelType: BaseModel]:
 
     def update(self, data: dict, **kwargs) -> list[int]:
         """Updates entities matching the given fields."""
-        query = self._build_query(**kwargs)
-        return self.table.update(data, query)
+        with db_lock:
+            return self.table.update(data, self._build_query(**kwargs))
 
     def remove(self, **kwargs) -> list[int]:
         """Removes entities matching the given fields."""
-        query = self._build_query(**kwargs)
-        return self.table.remove(query)
+        with db_lock:
+            return self.table.remove(self._build_query(**kwargs))
 
     def exists(self, **kwargs) -> bool:
         """Checks if an entity with the given fields exists."""
