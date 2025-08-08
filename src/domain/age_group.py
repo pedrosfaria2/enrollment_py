@@ -6,10 +6,14 @@ from dataclasses import dataclass
 class AgeGroupError(Exception): ...
 
 
-class DuplicateAgeGroupError(AgeGroupError): ...
+class DuplicateAgeGroupError(AgeGroupError):
+    def __init__(self, msg: str = "Age group name already exists."):
+        super().__init__(msg)
 
 
-class AgeGroupOverlapError(AgeGroupError): ...
+class AgeGroupOverlapError(AgeGroupError):
+    def __init__(self, msg: str = "Age range overlaps an existing group."):
+        super().__init__(msg)
 
 
 @dataclass(frozen=True, slots=True)
