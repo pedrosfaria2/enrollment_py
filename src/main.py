@@ -1,7 +1,7 @@
 import uvicorn
 
-from src.infra.api import APIBuilder
-from src.settings import cfg
+from infra.api import APIBuilder
+from settings import cfg
 
 builder = APIBuilder(cfg)
 builder.build_stack()
