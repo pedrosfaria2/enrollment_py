@@ -1,4 +1,4 @@
-from domain.age_group import AgeGroup
+from domain.age_group import AgeGroup, DuplicateAgeGroupError
 from infra.repositories.age_group import AgeGroupRepository
 
 
@@ -7,6 +7,8 @@ class AgeGroupService:
         self._repo = repo
 
     async def create(self, name: str, min_age: int, max_age: int) -> AgeGroup:
+        if self._repo.exists(name=name):
+            raise DuplicateAgeGroupError(f"Age group '{name}' already exists.")
         conflicts = self._repo.find_overlapping(min_age=min_age, max_age=max_age)
         entity = AgeGroup.create(name, min_age, max_age, conflicts)
         self._repo.insert(entity)
