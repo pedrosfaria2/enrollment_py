@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from sys import stderr
 
 from dotenv import load_dotenv
@@ -8,23 +9,19 @@ from pydantic_settings import BaseSettings
 
 load_dotenv()
 
+PROJECT_ROOT = Path(__file__).parent.parent
+
 
 class Config(BaseSettings):
     ENVIRONMENT: str = Field(
         default=os.getenv("ENVIRONMENT", "dev"),
         description="Project execution environment",
     )
-    DATABASE_NAME: str = Field(
-        default=os.getenv("DATABASE_NAME", "DB"),
-        description="Database name used",
+    DB_FILE_PATH: str = Field(
+        default=os.getenv("DB_FILE_PATH", str(PROJECT_ROOT / "suthub_db.json")),
+        description="File path for the application's TinyDB database",
     )
-    DATABASE_URL: str = Field(
-        default=os.getenv(
-            "DATABASE_URL",
-            f"sqlite:///{os.path.abspath(os.path.join(os.path.dirname(__file__), '../database.db'))}",
-        ),
-        description="Database connection URL",
-    )
+    DB_LOCK_TIMEOUT: int = Field(ge=1, default=10, description="Database lock timeout in seconds")
     RABBITMQ_HOST: str = Field(
         default=os.getenv("RABBITMQ_HOST", "localhost"),
         description="RabbitMQ host",
