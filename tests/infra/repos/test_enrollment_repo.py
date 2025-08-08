@@ -1,6 +1,6 @@
+from domain.enrollment import Enrollment
 from infra.enumerators.enrollment import EnrollmentStatus
 from infra.repositories.enrollment import EnrollmentRepository
-from infra.schemas.enrollment import Enrollment
 
 
 def test_enrollment_repo_methods(tmp_db):
