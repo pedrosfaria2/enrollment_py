@@ -1,36 +1,48 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from fastapi.security import HTTPBasic
 from starlette.middleware.cors import CORSMiddleware
 
+from infra.api.age_groups import AgeGroupAPI
 from infra.schemas.health import HealthOutput
 from settings import Config
 
+security = HTTPBasic()
+
 
 class APIBuilder:
-    def __init__(self, settings: Config):
-        self.cfg = settings
+    def __init__(self, cfg: Config, *, allowed_origins: list[str] | None = None):
+        self.cfg = cfg
+        show_docs = cfg.ENVIRONMENT in {"dev", "hmg", "test", "development"}
         self.app = FastAPI(
             title="Enrollment API",
-            description="API for enrollment management",
             version="1.0.0",
-            openapi_url=("/openapi.json" if self.cfg.ENVIRONMENT in ("dev", "hmg", "test", "development") else None),
-            docs_url=("/docs" if self.cfg.ENVIRONMENT in ("dev", "hmg", "test", "development") else None),
-            redoc_url=("/redoc" if self.cfg.ENVIRONMENT in ("dev", "hmg", "test", "development") else None),
+            openapi_url="/openapi.json" if show_docs else None,
+            docs_url="/docs" if show_docs else None,
+            redoc_url="/redoc" if show_docs else None,
+            dependencies=[Depends(security)],
         )
+        self._setup_middlewares(allowed_origins or ["*"])
+
+    def __call__(self) -> FastAPI:
+        return self.app
 
     def build_stack(self):
-        self._middlewares()
-        self._health_api()
+        self._register_health()
+        self._register_age_groups()
 
-    def _middlewares(self):
+    def _setup_middlewares(self, origins: list[str]):
         self.app.add_middleware(
             CORSMiddleware,
-            allow_origins=["*"],
+            allow_origins=origins,
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
         )
 
-    def _health_api(self):
-        @self.app.get("/", response_model=HealthOutput, status_code=200)
-        def health_status():
-            return HealthOutput(environment=self.cfg.ENVIRONMENT).model_dump()
+    def _register_health(self):
+        @self.app.get("/health", response_model=HealthOutput)
+        def health():
+            return HealthOutput(environment=self.cfg.ENVIRONMENT)
+
+    def _register_age_groups(self):
+        AgeGroupAPI(self.app)
