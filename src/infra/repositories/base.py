@@ -40,10 +40,34 @@ class BaseRepository[T]:
 
     def _build_query(self, **kwargs) -> QueryInstance:
         """Builds a TinyDB Query object from keyword arguments."""
-        query_list = [(getattr(self.Query, key) == value) for key, value in kwargs.items()]
-        if not query_list:
+        if not kwargs:
             raise ValueError("Cannot build a query with no keyword arguments.")
-        return query_list[0] if len(query_list) == 1 else reduce(lambda q1, q2: q1 & q2, query_list)
+
+        def _one(key, value):  # noqa: PLR0911
+            if "__" not in key:
+                return getattr(self.Query, key) == value
+            field, op = key.split("__", 1)
+            qf = getattr(self.Query, field)
+            match op:
+                case "lt":
+                    return qf < value
+                case "lte":
+                    return qf <= value
+                case "gt":
+                    return qf > value
+                case "gte":
+                    return qf >= value
+                case "ne":
+                    return qf != value
+                case "in":
+                    return qf.one_of(value)
+                case "nin":
+                    return ~qf.one_of(value)
+                case _:
+                    raise ValueError(f"Unsupported operator: {op}")
+
+        queries = [_one(k, v) for k, v in kwargs.items()]
+        return queries[0] if len(queries) == 1 else reduce(lambda a, b: a & b, queries)
 
     def insert(self, entity: T) -> T:
         """Inserts a new entity into the database."""
