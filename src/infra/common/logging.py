@@ -115,19 +115,22 @@ class LogAPIRoute(APIRoute):
 
     @staticmethod
     def _handle_exceptions(error: Exception) -> HTTPException:
-        """
-        Handles exceptions, converting them to HTTPExceptions with appropriate status codes.
-        """
         error_code = uuid4()
         if isinstance(error, HTTPException):
             error.detail = f"{error.detail}. Error code: {error_code}"
             return error
         elif isinstance(error, RequestValidationError):
-            fields_error = (
-                f"Invalid field(s): {', '.join(err['loc'][-1] for err in error.errors())}"
-                if error.errors()
-                else str(error)
-            )
+            if error.errors():
+                parts = []
+                for err in error.errors():
+                    loc = err.get("loc")
+                    if isinstance(loc, (list, tuple)) and loc:
+                        parts.append(str(loc[-1]))
+                    else:
+                        parts.append(str(err.get("type", "validation_error")))
+                fields_error = f"Invalid field(s): {', '.join(parts)}"
+            else:
+                fields_error = str(error)
             return HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Validation error: {fields_error}. Error code: {error_code}",
