@@ -16,6 +16,11 @@ class AgeGroupOverlapError(AgeGroupError):
         super().__init__(msg)
 
 
+class AgeGroupInUseError(AgeGroupError):
+    def __init__(self, msg: str = "Age group is in use and cannot be deleted."):
+        super().__init__(msg)
+
+
 @dataclass(frozen=True, slots=True)
 class AgeRange:
     min_age: int

@@ -9,13 +9,14 @@ from app.usecases.age_group import AgeGroupUseCase
 from infra.api.age_groups import AgeGroupAPI
 from infra.dependencies.age_groups import provide_use_case
 from infra.repositories.age_group import AgeGroupRepository
+from worker.consumer import EnrollmentRepository
 
 
 @pytest.fixture
 def app_client(tmp_db) -> tuple[TestClient, Callable[[], None]]:
     table = tmp_db.table("age_groups")
     repo = AgeGroupRepository(table=table)
-    svc = AgeGroupService(repo)
+    svc = AgeGroupService(repo, enrollments=EnrollmentRepository())
     uc = AgeGroupUseCase(svc)
 
     app = FastAPI()

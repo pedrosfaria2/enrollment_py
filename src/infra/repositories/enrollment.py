@@ -48,3 +48,9 @@ class EnrollmentRepository(BaseRepository[Enrollment]):
 
     def find_by_cpf(self, cpf: str) -> Enrollment | None:
         return self.get_by_fields(cpf=cpf)
+
+    def exists_by_age_group(self, name: str, *, only_approved: bool = True) -> bool:
+        fields: dict[str, Any] = {"age_group_name": name}
+        if only_approved:
+            fields["status"] = EnrollmentStatus.APPROVED.value
+        return self.exists(**fields)
