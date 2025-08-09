@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from infra.api.age_groups import AgeGroupAPI
+from infra.common.logging import LogAPIRoute
 from infra.schemas.health import HealthOutput
 from infra.security.basic_auth import BasicAuthGuard
 from settings import Config
@@ -20,6 +21,7 @@ class APIBuilder:
             redoc_url="/redoc" if show_docs else None,
         )
 
+        self.app.router.route_class = LogAPIRoute
         self._auth = BasicAuthGuard(cfg.API_USERNAME, cfg.API_PASSWORD)
         self._setup_middlewares(allowed_origins or ["*"])
 
