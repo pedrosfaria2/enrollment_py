@@ -232,7 +232,7 @@ def test_extract_request_data_outer_exception(monkeypatch):
     app.include_router(router)
     client = TestClient(app)
     _RouteInfo._logger.records.clear()
-    r = client.post("/txt", data="x", headers={"content-type": "text/plain"}) # type: ignore
+    r = client.post("/txt", data="x", headers={"content-type": "text/plain"})  # type: ignore
     assert r.status_code == 200
     assert any(isinstance(x, str) and "Error processing request:" in x for x in _RouteInfo._logger.records)
 
@@ -310,7 +310,7 @@ def test_truncation_of_body_and_response():
     app.include_router(router)
     client = TestClient(app)
     _RouteTrunc._logger.records.clear()
-    r = client.post("/echo", data="Y" * 20, headers={"content-type": "text/plain"}) # type: ignore
+    r = client.post("/echo", data="Y" * 20, headers={"content-type": "text/plain"})  # type: ignore
     assert r.status_code == 200
     rec = next(x for x in _RouteTrunc._logger.records if isinstance(x, dict))
     assert rec["body"] == "Y" * 5
