@@ -1,14 +1,21 @@
+from __future__ import annotations
+
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from infra.enumerators.enrollment import EnrollmentStatus
 
 
+class EnrollmentCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(..., min_length=3, description="Full name.")
+    age: Annotated[int, Field(ge=0, description="Age.")]
+    cpf: str = Field(..., pattern=r"^\d{3}\.\d{3}\.\d{3}-\d{2}$", description="CPF 999.999.999-99.")
+
+
 class Enrollment(BaseModel):
-    name: str = Field(..., min_length=3, description="The full name of the person enrolling.")
-    age: Annotated[int, Field(ge=0, description="The age of the person.")]
-    cpf: str = Field(..., pattern=r"^\d{3}\.\d{3}\.\d{3}-\d{2}$", description="The CPF in the format 123.456.789-00.")
-    status: EnrollmentStatus = Field(
-        default=EnrollmentStatus.PENDING, description="The current status of the enrollment."
-    )
+    name: str
+    age: int
+    cpf: str
+    status: EnrollmentStatus = Field(default=EnrollmentStatus.PENDING, description="Final status.")
