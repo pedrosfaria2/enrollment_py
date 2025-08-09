@@ -42,6 +42,14 @@ class Config(BaseSettings):
         default=os.getenv("RABBITMQ_VHOST", "/"),
         description="RabbitMQ virtual host",
     )
+    API_USERNAME: str = Field(
+        default=os.getenv("API_USERNAME", "admin"),
+        description="API Basic Auth username",
+    )
+    API_PASSWORD: str = Field(
+        default=os.getenv("API_PASSWORD", "secret123"),
+        description="API Basic Auth password",
+    )
 
     @property
     def RABBITMQ_URL(self) -> str:  # noqa
