@@ -15,8 +15,8 @@ def test_enrollment_ok_with_default_status():
 
 
 def test_enrollment_ok_with_explicit_status():
-    e = Enrollment(name="Bob", age=22, cpf="000.000.000-00", status=EnrollmentStatus.APPROVED)
-    assert e.status == EnrollmentStatus.APPROVED
+    e = Enrollment(name="Bob", age=22, cpf="000.000.000-00", status=EnrollmentStatus.REJECTED)
+    assert e.status == EnrollmentStatus.REJECTED
 
 
 def test_negative_age_raises():

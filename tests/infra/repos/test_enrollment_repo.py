@@ -14,10 +14,10 @@ def test_enrollment_repo_methods(tmp_db):
     found = repo.find_by_cpf("123.456.789-09")
     assert found is not None and found.name == "Maria"
 
-    repo.update({"status": EnrollmentStatus.APPROVED}, cpf="123.456.789-09")
+    repo.update({"status": EnrollmentStatus.REJECTED}, cpf="123.456.789-09")
     after = repo.find_by_cpf("123.456.789-09")
     assert after is not None
-    assert after.status is EnrollmentStatus.APPROVED
+    assert after.status is EnrollmentStatus.REJECTED
 
     assert repo.exists(cpf="123.456.789-09")
     assert repo.count() == 1
