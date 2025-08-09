@@ -45,3 +45,6 @@ class AgeGroupRepository(BaseRepository[AgeGroup]):
             min_age__lte=max_age,
             max_age__gte=min_age,
         )
+
+    def find_covering(self, age: int) -> AgeGroup | None:
+        return self.get_by_fields(min_age__lte=age, max_age__gte=age)
