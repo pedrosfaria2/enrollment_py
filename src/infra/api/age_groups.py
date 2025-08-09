@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, params, status
 
 from app.usecases.age_group import AgeGroupUseCase
 from domain.age_group import AgeGroupOverlapError, DuplicateAgeGroupError
@@ -13,11 +14,16 @@ from infra.utils.pagination import Pagination
 
 
 class AgeGroupAPI:
-    TAGS: list[str] = ["Age Groups"]
+    TAGS = ["Age Groups"]
     PREFIX = "/age-groups"
 
-    def __init__(self, app: FastAPI) -> None:
-        self.router = APIRouter()
+    def __init__(
+        self,
+        app: FastAPI,
+        *,
+        dependencies: Sequence[params.Depends] | None = None,
+    ) -> None:
+        self.router = APIRouter(dependencies=list(dependencies) if dependencies else None)
         self._register_routes()
         app.include_router(self.router, prefix=self.PREFIX, tags=list(self.TAGS))
 
