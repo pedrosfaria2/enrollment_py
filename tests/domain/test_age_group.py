@@ -1,4 +1,3 @@
-# tests/test_age_group_domain.py
 from dataclasses import FrozenInstanceError
 
 import pytest
