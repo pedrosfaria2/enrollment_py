@@ -29,6 +29,9 @@ class EnrollmentRepository(BaseRepository[Enrollment]):
             age=data["age"],
             cpf=data["cpf"],
             status=EnrollmentStatus(data["status"]),
+            requested_at=data.get("requested_at"),
+            enrolled_at=data.get("enrolled_at"),
+            age_group_name=data.get("age_group_name"),
         )
 
     @staticmethod
@@ -38,6 +41,9 @@ class EnrollmentRepository(BaseRepository[Enrollment]):
             "age": entity.age,
             "cpf": entity.cpf,
             "status": entity.status.value,
+            "requested_at": entity.requested_at,
+            "enrolled_at": entity.enrolled_at,
+            "age_group_name": entity.age_group_name,
         }
 
     def find_by_cpf(self, cpf: str) -> Enrollment | None:
