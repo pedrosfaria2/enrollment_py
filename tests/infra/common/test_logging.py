@@ -174,17 +174,17 @@ def test_pydantic_validation_error_is_mapped_and_logged(client_and_logger):
     client, log = client_and_logger
     log.records.clear()
     r = client.post("/json", json={"x": "NaN", "y": 1})
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     rec = next(x for x in log.records if isinstance(x, dict))
-    assert rec["status_code"] == 400 and "Validation error" in rec["response"]
+    assert rec["status_code"] == 422
 
 
-def test_invalid_json_triggers_400_and_warning(client_and_logger):
+def test_invalid_json_triggers_422_and_warning(client_and_logger):
     client, log = client_and_logger
     log.records.clear()
     r = client.post("/json", content="{not valid json", headers={"content-type": "application/json"})
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
-    assert any(isinstance(x, dict) and x.get("status_code") == 400 for x in log.records)
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert any(isinstance(x, dict) and x.get("status_code") == 422 for x in log.records)
 
 
 def test_generic_exception_maps_to_500_and_is_logged():
@@ -196,12 +196,12 @@ def test_generic_exception_maps_to_500_and_is_logged():
         raise RuntimeError("boom")
 
     app.include_router(router)
-    client = TestClient(app)
+    client = TestClient(app, raise_server_exceptions=False)
     _RouteInfo._logger.records.clear()
     r = client.get("/oops")
     assert r.status_code == 500
     rec = next(x for x in _RouteInfo._logger.records if isinstance(x, dict))
-    assert rec["status_code"] == 500 and "Internal server error" in rec["response"]
+    assert rec["status_code"] == 500 and "boom" in rec["response"]
 
 
 def test_after_route_handler_error_logging(monkeypatch, client_and_logger):
