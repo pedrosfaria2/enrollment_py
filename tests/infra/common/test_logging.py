@@ -143,10 +143,11 @@ def test_urlencoded_form_is_captured(client_and_logger):
 def test_plain_text_is_captured_as_string(client_and_logger):
     client, log = client_and_logger
     log.records.clear()
-    r = client.post("/text", data="hello world", headers={"content-type": "text/plain"})
+    r = client.post("/text", content="hello world", headers={"content-type": "text/plain"})
     assert r.status_code == 200
     rec = next(x for x in log.records if isinstance(x, dict))
-    assert rec["status_code"] == 200 and rec["body"] == "hello world"
+    assert rec["status_code"] == 200
+    assert rec["body"] == "hello world"
 
 
 def test_file_upload_branch_in_form_processing(client_and_logger):
@@ -181,7 +182,7 @@ def test_pydantic_validation_error_is_mapped_and_logged(client_and_logger):
 def test_invalid_json_triggers_400_and_warning(client_and_logger):
     client, log = client_and_logger
     log.records.clear()
-    r = client.post("/json", data="{not valid json", headers={"content-type": "application/json"})
+    r = client.post("/json", content="{not valid json", headers={"content-type": "application/json"})
     assert r.status_code == status.HTTP_400_BAD_REQUEST
     assert any(isinstance(x, dict) and x.get("status_code") == 400 for x in log.records)
 
@@ -232,7 +233,7 @@ def test_extract_request_data_outer_exception(monkeypatch):
     app.include_router(router)
     client = TestClient(app)
     _RouteInfo._logger.records.clear()
-    r = client.post("/txt", data="x", headers={"content-type": "text/plain"})  # type: ignore
+    r = client.post("/txt", content="x", headers={"content-type": "text/plain"})
     assert r.status_code == 200
     assert any(isinstance(x, str) and "Error processing request:" in x for x in _RouteInfo._logger.records)
 
@@ -310,7 +311,7 @@ def test_truncation_of_body_and_response():
     app.include_router(router)
     client = TestClient(app)
     _RouteTrunc._logger.records.clear()
-    r = client.post("/echo", data="Y" * 20, headers={"content-type": "text/plain"})  # type: ignore
+    r = client.post("/echo", content="Y" * 20, headers={"content-type": "text/plain"})
     assert r.status_code == 200
     rec = next(x for x in _RouteTrunc._logger.records if isinstance(x, dict))
     assert rec["body"] == "Y" * 5
