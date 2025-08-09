@@ -3,6 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from infra.api.age_groups import AgeGroupAPI
 from infra.api.enrollment import EnrollmentAPI
+from infra.api.enrollment_admin import EnrollmentAdminAPI
 from infra.common.logging import LogAPIRoute
 from infra.schemas.health import HealthOutput
 from infra.security.basic_auth import BasicAuthGuard
@@ -33,6 +34,7 @@ class APIBuilder:
         self._register_health()  # public
         self._register_age_groups()  # protected
         self._register_enrollment()  # public
+        self._register_enrollment_admin()  # protected
 
     def _setup_middlewares(self, origins: list[str]) -> None:
         self.app.add_middleware(
@@ -53,3 +55,6 @@ class APIBuilder:
 
     def _register_enrollment(self) -> None:
         EnrollmentAPI(self.app)
+
+    def _register_enrollment_admin(self) -> None:
+        EnrollmentAdminAPI(self.app, dependencies=[Depends(self._auth)])

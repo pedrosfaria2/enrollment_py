@@ -19,6 +19,9 @@ class EnrollmentService:
 
         existing = self._enrollments.find_by_cpf(cpf)
 
+        if existing and existing.status == EnrollmentStatus.APPROVED:
+            raise PermissionError("enrollment already approved for this CPF")
+
         e = Enrollment.create_final(
             name=name,
             age=age,
