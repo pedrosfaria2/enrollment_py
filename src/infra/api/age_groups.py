@@ -5,6 +5,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, params, status
 
+from app.services.age_group import AgeGroupInUseError
 from app.usecases.age_group import AgeGroupUseCase
 from domain.age_group import AgeGroupOverlapError, DuplicateAgeGroupError
 from infra.common.logging import LogAPIRoute
@@ -113,3 +114,5 @@ class AgeGroupAPI:
             await uc.delete(name)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except AgeGroupInUseError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
