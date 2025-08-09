@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from sys import stderr
+from urllib.parse import quote
 
 from dotenv import load_dotenv
 from loguru import logger
@@ -56,9 +57,9 @@ class Config(BaseSettings):
     )
 
     @property
-    def RABBITMQ_URL(self) -> str:  # noqa
-        """RabbitMQ connection URL"""
-        return f"amqp://{self.RABBITMQ_USER}:{self.RABBITMQ_PASS}@{self.RABBITMQ_HOST}:{self.RABBITMQ_PORT}/{self.RABBITMQ_VHOST}"
+    def RABBITMQ_URL(self) -> str:  # noqa: N802
+        vhost = quote(self.RABBITMQ_VHOST or "/", safe="")
+        return f"amqp://{self.RABBITMQ_USER}:{self.RABBITMQ_PASS}@{self.RABBITMQ_HOST}:{self.RABBITMQ_PORT}/{vhost}"
 
     def configure_logging(self):
         logger.remove()
