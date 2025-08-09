@@ -50,6 +50,10 @@ class Config(BaseSettings):
         default=os.getenv("API_PASSWORD", "secret123"),
         description="API Basic Auth password",
     )
+    QUEUE_NAME: str = Field(
+        default=os.getenv("QUEUE_NAME", "enrollments.requests"),
+        description="RabbitMQ queue name for enrollment requests",
+    )
 
     @property
     def RABBITMQ_URL(self) -> str:  # noqa
