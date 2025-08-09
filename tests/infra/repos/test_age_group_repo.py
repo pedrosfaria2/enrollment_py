@@ -1,13 +1,13 @@
+from domain.age_group import AgeGroup, AgeRange
 from infra.repositories.age_group import AgeGroupRepository
-from infra.schemas.age_group import AgeGroup
 
 
 def test_age_group_repo(tmp_db):
     repo = AgeGroupRepository(table=tmp_db.table("age_groups"))
 
-    repo.insert(AgeGroup(name="Child", min_age=0, max_age=12))
-    repo.insert(AgeGroup(name="Adult", min_age=18, max_age=64))
-    repo.insert(AgeGroup(name="Senior", min_age=65, max_age=120))
+    repo.insert(AgeGroup(name="Child", age_range=AgeRange(0, 12)))
+    repo.insert(AgeGroup(name="Adult", age_range=AgeRange(18, 64)))
+    repo.insert(AgeGroup(name="Senior", age_range=AgeRange(65, 120)))
 
     adult = repo.get_by_id(2)
     assert adult is not None
@@ -18,7 +18,7 @@ def test_age_group_repo(tmp_db):
 
     repo.update({"max_age": 13}, name="Child")
     updated = repo.find_by_name("Child")
-    assert updated is not None and updated.max_age == 13
+    assert updated is not None and updated.age_range.max_age == 13
 
     assert repo.exists(name="Senior")
     assert repo.count() == 3

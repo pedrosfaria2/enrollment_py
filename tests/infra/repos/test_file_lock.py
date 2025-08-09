@@ -3,8 +3,8 @@ from pathlib import Path
 
 from tinydb import JSONStorage, TinyDB
 
+from domain.age_group import AgeGroup, AgeRange
 from infra.repositories.age_group import AgeGroupRepository
-from infra.schemas.age_group import AgeGroup
 
 
 def _worker(path: str, batch):
@@ -19,7 +19,7 @@ def _worker(path: str, batch):
 
 def test_file_lock(tmp_path):
     db_path = Path(tmp_path) / "lock.json"
-    batches = [[AgeGroup(name=f"g{t}_{i}", min_age=i, max_age=i) for i in range(10)] for t in range(5)]
+    batches = [[AgeGroup(name=f"g{t}_{i}", age_range=AgeRange(i, i)) for i in range(10)] for t in range(5)]
 
     with ThreadPoolExecutor(max_workers=5) as pool:
         futures = []

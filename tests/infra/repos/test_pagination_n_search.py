@@ -1,12 +1,12 @@
+from domain.age_group import AgeGroup, AgeRange
 from infra.repositories.age_group import AgeGroupRepository
-from infra.schemas.age_group import AgeGroup
 
 
 def test_pagination_and_search(tmp_db):
     repo = AgeGroupRepository(table=tmp_db.table("age_groups"))
 
     for i in range(10):
-        repo.insert(AgeGroup(name=f"G{i}", min_age=i, max_age=i))
+        repo.insert(AgeGroup(name=f"G{i}", age_range=AgeRange(i, i)))
 
     page1 = repo.get_all(limit=3)
     page2 = repo.get_all(offset=3, limit=3)
