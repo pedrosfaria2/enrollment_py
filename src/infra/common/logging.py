@@ -2,7 +2,6 @@ import json
 import time
 from collections.abc import Callable
 from typing import Any
-from uuid import uuid4
 
 from fastapi import HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
@@ -32,34 +31,60 @@ class LogAPIRoute(APIRoute):
         self.log_level = log_level.upper()
 
     def get_route_handler(self) -> Callable:
-        """
-        Returns the route handler that executes logging before and after request processing.
-        """
-        original_route_handler = super().get_route_handler()
+        original = super().get_route_handler()
 
-        async def log_route_handler(request: Request) -> Response:
+        async def handler(request: Request) -> Response:
             params, body = await self._extract_request_data(request)
-            before_time = time.time()
-
+            started = time.time()
             try:
-                response = await original_route_handler(request)
-            except Exception as error:
-                response = self._handle_exceptions(error)
+                response = await original(request)
+            except Exception as exc:
+                await self._log_exception(request, exc, started, params, body)
+                raise
+            else:
+                await self._after_route_handler(
+                    request=request,
+                    response=response,
+                    before_time=started,
+                    params=params,
+                    body=body,
+                )
+                return response
 
-            await self._after_route_handler(
-                request=request,
-                response=response,
-                before_time=before_time,
-                params=params,
-                body=body,
-            )
+        return handler
 
-            if isinstance(response, HTTPException):
-                raise response
+    async def _log_exception(
+        self,
+        request: Request,
+        error: Exception,
+        before_time: float,
+        params: dict[str, Any],
+        body: Any,
+    ) -> None:
+        duration = time.time() - before_time
+        requester = await self._get_requestor_data(request)
 
-            return response
+        if isinstance(error, HTTPException):
+            status_code = error.status_code
+            response_text = str(getattr(error, "detail", error))
+        elif isinstance(error, RequestValidationError):
+            status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+            response_text = "Validation error"
+        else:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response_text = str(error)
 
-        return log_route_handler
+        log_data = {
+            "url": str(request.url),
+            "method": request.method,
+            "status_code": status_code,
+            "duration": f"{duration:.3f}s",
+            "parameters": params,
+            "body": body if isinstance(body, str) else body,
+            "response": response_text,
+            "requester": requester,
+        }
+        self.logger.warning(log_data)
 
     async def _extract_request_data(self, request: Request) -> tuple[dict[str, Any], Any]:
         """
@@ -112,34 +137,6 @@ class LogAPIRoute(APIRoute):
             else:
                 form_data_dict[key] = str(value)
         return form_data_dict
-
-    @staticmethod
-    def _handle_exceptions(error: Exception) -> HTTPException:
-        error_code = uuid4()
-        if isinstance(error, HTTPException):
-            error.detail = f"{error.detail}. Error code: {error_code}"
-            return error
-        elif isinstance(error, RequestValidationError):
-            if error.errors():
-                parts = []
-                for err in error.errors():
-                    loc = err.get("loc")
-                    if isinstance(loc, (list, tuple)) and loc:
-                        parts.append(str(loc[-1]))
-                    else:
-                        parts.append(str(err.get("type", "validation_error")))
-                fields_error = f"Invalid field(s): {', '.join(parts)}"
-            else:
-                fields_error = str(error)
-            return HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Validation error: {fields_error}. Error code: {error_code}",
-            )
-        else:
-            return HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Internal server error: {error}. Error code: {error_code}",
-            )
 
     async def _after_route_handler(
         self,

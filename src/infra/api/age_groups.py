@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, 
 
 from app.usecases.age_group import AgeGroupUseCase
 from domain.age_group import AgeGroupOverlapError, DuplicateAgeGroupError
+from infra.common.logging import LogAPIRoute
 from infra.dependencies.age_groups import provide_use_case
 from infra.schemas.age_group import AgeGroup as AgeGroupDTO
 from infra.schemas.pagination import PageResult
@@ -23,7 +24,10 @@ class AgeGroupAPI:
         *,
         dependencies: Sequence[params.Depends] | None = None,
     ) -> None:
-        self.router = APIRouter(dependencies=list(dependencies) if dependencies else None)
+        self.router = APIRouter(
+            dependencies=list(dependencies) if dependencies else None,
+            route_class=LogAPIRoute,
+        )
         self._register_routes()
         app.include_router(self.router, prefix=self.PREFIX, tags=list(self.TAGS))
 
