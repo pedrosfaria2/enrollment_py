@@ -18,6 +18,10 @@ class RabbitPublisher:
         self._conn: pika.BlockingConnection | None = None
         self._ch: BlockingChannel | None = None
         self._lock = threading.Lock()
+        self._unroutable = False
+
+    def _on_return(self, _ch, _method, _properties, _body) -> None:
+        self._unroutable = True
 
     def _ensure_channel(self) -> BlockingChannel:
         if self._conn and self._conn.is_open and self._ch and self._ch.is_open:
@@ -27,6 +31,7 @@ class RabbitPublisher:
         ch: BlockingChannel = conn.channel()
         ch.queue_declare(queue=self._queue, durable=True, auto_delete=False)
         ch.confirm_delivery()
+        ch.add_on_return_callback(self._on_return)
         self._conn = conn
         self._ch = ch
         return ch
@@ -45,16 +50,17 @@ class RabbitPublisher:
         props = pika.BasicProperties(content_type="application/json", delivery_mode=2)
         with self._lock:
             try:
+                self._unroutable = False
                 ch = self._ensure_channel()
-                ok = ch.basic_publish(
+                ch.basic_publish(
                     exchange="",
                     routing_key=self._queue,
                     body=body,
                     properties=props,
                     mandatory=True,
                 )
-                if not ok:
-                    raise AMQPError("broker did not confirm publish")
+                if self._unroutable:
+                    raise AMQPError("message was returned (unroutable)")
             except Exception as e:
                 self._reset()
                 raise RuntimeError(f"publish failed: {e}") from e
