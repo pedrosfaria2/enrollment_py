@@ -1,6 +1,8 @@
 services:
   rabbitmq:
-    image: rabbitmq:4-management
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.rabbitmq
     env_file:
       - ../.env
     ports:
