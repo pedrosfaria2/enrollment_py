@@ -26,6 +26,8 @@ make setup
 
 This installs dependencies and sets up the project in editable mode.
 
+An `.env_example` file is provided for configuration reference. For testing, copy it to `.env` in the root directory.
+
 ## Running
 
 ### Local Development
