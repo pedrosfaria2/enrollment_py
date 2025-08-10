@@ -12,10 +12,10 @@ class EnrollmentPublisher(Protocol):
 
 class EnrollmentUseCase:
     """Use case layer for enrollment operations."""
-    
+
     def __init__(self, service: EnrollmentService, publisher: EnrollmentPublisher) -> None:
         """Initialize use case with service and publisher dependencies.
-        
+
         Args:
             service: Service for enrollment operations
             publisher: Publisher for enrollment events
@@ -25,7 +25,7 @@ class EnrollmentUseCase:
 
     async def request(self, *, name: str, age: int, cpf: str) -> None:
         """Request enrollment and publish if successful.
-        
+
         Args:
             name: Student name for enrollment
             age: Student age for age group matching
@@ -37,10 +37,10 @@ class EnrollmentUseCase:
 
     async def status(self, *, cpf: str) -> Enrollment | None:
         """Find enrollment by CPF.
-        
+
         Args:
             cpf: CPF to search for
-            
+
         Returns:
             Enrollment if found, None otherwise
         """

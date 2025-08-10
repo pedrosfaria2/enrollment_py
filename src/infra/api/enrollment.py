@@ -14,7 +14,7 @@ from infra.schemas.enrollment import EnrollmentCreate
 
 class EnrollmentAPI:
     """API layer for enrollment operations."""
-    
+
     TAGS = ["Enrollments"]
     PREFIX = "/enrollments"
 
@@ -25,7 +25,7 @@ class EnrollmentAPI:
         dependencies: Sequence[params.Depends] | None = None,
     ) -> None:
         """Initialize API with FastAPI app and optional dependencies.
-        
+
         Args:
             app: FastAPI application instance
             dependencies: Optional dependencies for all routes
@@ -61,14 +61,14 @@ class EnrollmentAPI:
         uc: Annotated[EnrollmentUseCase, Depends(provide_use_case)],
     ) -> None:
         """Request enrollment processing.
-        
+
         Submits a new enrollment request for processing. The request is validated
         for age group coverage and duplicate CPF checking before being queued.
-        
+
         Args:
             dto: Enrollment creation data
             uc: Enrollment use case dependency
-            
+
         Raises:
             HTTPException: 422 if no age group covers the specified age
             HTTPException: 409 if enrollment already approved for this CPF
@@ -90,17 +90,17 @@ class EnrollmentAPI:
         uc: Annotated[EnrollmentUseCase, Depends(provide_use_case)],
     ) -> EnrollmentDTO:
         """Get enrollment status by CPF.
-        
+
         Retrieves the current enrollment status for a given CPF.
         CPF must be in the format XXX.XXX.XXX-XX.
-        
+
         Args:
             cpf: CPF to search for (format: XXX.XXX.XXX-XX)
             uc: Enrollment use case dependency
-            
+
         Returns:
             Enrollment data with current status
-            
+
         Raises:
             HTTPException: 404 if enrollment not found for the given CPF
         """

@@ -17,7 +17,7 @@ from infra.utils.pagination import Pagination
 
 class AgeGroupAPI:
     """API layer for age group operations."""
-    
+
     TAGS = ["Age Groups"]
     PREFIX = "/age-groups"
 
@@ -28,7 +28,7 @@ class AgeGroupAPI:
         dependencies: Sequence[params.Depends] | None = None,
     ) -> None:
         """Initialize API with FastAPI app and optional dependencies.
-        
+
         Args:
             app: FastAPI application instance
             dependencies: Optional dependencies for all routes
@@ -74,19 +74,19 @@ class AgeGroupAPI:
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[AgeGroupDTO]:
         """List age groups with pagination.
-        
+
         Retrieve a paginated list of all age groups in the system.
         Each age group contains name, minimum age, and maximum age information.
-        
+
         Args:
             request: HTTP request object
             uc: Age group use case dependency
             page: Page number (default: 1)
             page_size: Number of items per page (default: 100)
-            
+
         Returns:
             Paginated list of age groups
-            
+
         Raises:
             HTTPException: If there's an error retrieving age groups
         """
@@ -120,17 +120,17 @@ class AgeGroupAPI:
         uc: Annotated[AgeGroupUseCase, Depends(provide_use_case)],
     ) -> AgeGroupDTO:
         """Create new age group.
-        
+
         Creates a new age group with the specified name and age range.
         Age ranges cannot overlap with existing groups.
-        
+
         Args:
             group: Age group data to create
             uc: Age group use case dependency
-            
+
         Returns:
             Created age group
-            
+
         Raises:
             HTTPException: 409 if age group name already exists or age ranges overlap
             HTTPException: 422 if age range is invalid (min_age >= max_age)
@@ -153,14 +153,14 @@ class AgeGroupAPI:
         uc: Annotated[AgeGroupUseCase, Depends(provide_use_case)],
     ) -> None:
         """Delete age group by name.
-        
+
         Removes an age group from the system. Cannot delete age groups
         that are currently in use by existing enrollments.
-        
+
         Args:
             name: Name of age group to delete
             uc: Age group use case dependency
-            
+
         Raises:
             HTTPException: 404 if age group not found
             HTTPException: 409 if age group is in use by enrollments

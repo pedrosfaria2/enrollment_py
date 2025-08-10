@@ -9,13 +9,13 @@ from infra.repositories.enrollment import EnrollmentRepository
 
 class EnrollmentService:
     """Service layer for enrollment operations.
-    
+
     Handles enrollment creation and status retrieval.
     """
-    
+
     def __init__(self, age_groups: AgeGroupRepository, enrollments: EnrollmentRepository) -> None:
         """Initialize service with repository dependencies.
-        
+
         Args:
             age_groups: Repository for age group data operations
             enrollments: Repository for enrollment data operations
@@ -25,12 +25,12 @@ class EnrollmentService:
 
     async def prepare_request(self, *, name: str, age: int, cpf: str) -> dict[str, object] | None:
         """Prepare enrollment request with age group validation.
-        
+
         Args:
             name: Student name for enrollment
             age: Student age for age group matching
             cpf: Student CPF for duplicate checking
-            
+
         Returns:
             Enrollment data dictionary if successful, None if already approved
         """
@@ -68,10 +68,10 @@ class EnrollmentService:
 
     async def status(self, *, cpf: str) -> Enrollment | None:
         """Find enrollment by CPF.
-        
+
         Args:
             cpf: CPF to search for
-            
+
         Returns:
             Enrollment if found, None otherwise
         """

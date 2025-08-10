@@ -5,26 +5,27 @@ from dataclasses import dataclass
 
 class AgeGroupError(Exception):
     """Base exception for age group related errors."""
+
     ...
 
 
 class DuplicateAgeGroupError(AgeGroupError):
     """Raised when attempting to create an age group with a name that already exists."""
-    
+
     def __init__(self, msg: str = "Age group name already exists."):
         super().__init__(msg)
 
 
 class AgeGroupOverlapError(AgeGroupError):
     """Raised when an age group's range overlaps with an existing age group."""
-    
+
     def __init__(self, msg: str = "Age range overlaps an existing group."):
         super().__init__(msg)
 
 
 class AgeGroupInUseError(AgeGroupError):
     """Raised when attempting to delete an age group that is currently in use."""
-    
+
     def __init__(self, msg: str = "Age group is in use and cannot be deleted."):
         super().__init__(msg)
 
@@ -32,6 +33,7 @@ class AgeGroupInUseError(AgeGroupError):
 @dataclass(frozen=True, slots=True)
 class AgeRange:
     """Age range with inclusive min/max boundaries and overlap detection."""
+
     min_age: int
     max_age: int
 
@@ -48,6 +50,7 @@ class AgeRange:
 @dataclass(slots=True)
 class AgeGroup:
     """Named age group with unique name and non-overlapping age range."""
+
     name: str
     age_range: AgeRange
 

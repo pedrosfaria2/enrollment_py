@@ -12,13 +12,13 @@ from settings import Config
 
 class APIBuilder:
     """Builder for FastAPI application with enrollment endpoints.
-    
+
     Configures FastAPI app with CORS, authentication, and API routes.
     """
-    
+
     def __init__(self, cfg: Config, *, allowed_origins: list[str] | None = None) -> None:
         """Initialize API builder with configuration.
-        
+
         Args:
             cfg: Application configuration
             allowed_origins: CORS allowed origins (default: ["*"])
@@ -40,7 +40,7 @@ class APIBuilder:
 
     def __call__(self) -> FastAPI:
         """Return the FastAPI application instance.
-        
+
         Returns:
             Configured FastAPI application
         """
@@ -55,7 +55,7 @@ class APIBuilder:
 
     def _setup_middlewares(self, origins: list[str]) -> None:
         """Setup CORS middleware for the application.
-        
+
         Args:
             origins: List of allowed origins for CORS
         """
@@ -69,10 +69,11 @@ class APIBuilder:
 
     def _register_health(self) -> None:
         """Register health check endpoint."""
+
         @self.app.get("/health", response_model=HealthOutput)
         def health() -> HealthOutput:
             """Health check endpoint.
-            
+
             Returns:
                 Health status with environment information
             """

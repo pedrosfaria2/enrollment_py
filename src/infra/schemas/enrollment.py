@@ -18,4 +18,6 @@ class Enrollment(BaseModel):
     name: str = Field(description="Student's full name")
     age: int = Field(description="Student's age in years")
     cpf: str = Field(description="Brazilian CPF document number")
-    status: EnrollmentStatus = Field(default=EnrollmentStatus.PENDING, description="Current enrollment status (PENDING, APPROVED, REJECTED)")
+    status: EnrollmentStatus = Field(
+        default=EnrollmentStatus.PENDING, description="Current enrollment status (PENDING, APPROVED, REJECTED)"
+    )

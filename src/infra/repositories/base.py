@@ -13,7 +13,7 @@ T = TypeVar("T")
 
 class BaseRepository[T]:
     """Generic repository for TinyDB operations.
-    
+
     Provides common CRUD operations for domain entities using TinyDB storage.
     """
 
@@ -34,10 +34,10 @@ class BaseRepository[T]:
 
     def _to_model(self, document: Document | None) -> T | None:
         """Convert TinyDB document to domain entity.
-        
+
         Args:
             document: TinyDB document to convert
-            
+
         Returns:
             Domain entity instance or None
         """
@@ -47,13 +47,13 @@ class BaseRepository[T]:
 
     def _build_query(self, **kwargs) -> QueryInstance:
         """Build TinyDB query from keyword arguments.
-        
+
         Args:
             **kwargs: Field filters with optional operators (field__op=value)
-            
+
         Returns:
             TinyDB query instance
-            
+
         Raises:
             ValueError: If no arguments provided or unsupported operator used
         """
@@ -88,10 +88,10 @@ class BaseRepository[T]:
 
     def insert(self, entity: T) -> T:
         """Insert new entity into database.
-        
+
         Args:
             entity: Domain entity to insert
-            
+
         Returns:
             The inserted entity
         """
@@ -101,10 +101,10 @@ class BaseRepository[T]:
 
     def get_by_id(self, doc_id: int) -> T | None:
         """Get entity by document ID.
-        
+
         Args:
             doc_id: Document ID to search for
-            
+
         Returns:
             Domain entity if found, None otherwise
         """
@@ -113,10 +113,10 @@ class BaseRepository[T]:
 
     def get_by_fields(self, **kwargs) -> T | None:
         """Get first entity matching field criteria.
-        
+
         Args:
             **kwargs: Field filters to match
-            
+
         Returns:
             First matching entity or None
         """
@@ -128,11 +128,11 @@ class BaseRepository[T]:
 
     def get_all(self, offset: int = 0, limit: int = 100) -> list[T]:
         """Get all entities with pagination.
-        
+
         Args:
             offset: Number of records to skip (default: 0)
             limit: Maximum number of records to return (default: 100)
-            
+
         Returns:
             List of domain entities
         """
@@ -142,12 +142,12 @@ class BaseRepository[T]:
 
     def search_by_fields(self, offset: int = 0, limit: int = 100, **kwargs) -> list[T]:
         """Search entities by field criteria with pagination.
-        
+
         Args:
             offset: Number of records to skip (default: 0)
             limit: Maximum number of records to return (default: 100)
             **kwargs: Field filters to match
-            
+
         Returns:
             List of matching domain entities
         """
@@ -160,11 +160,11 @@ class BaseRepository[T]:
 
     def update(self, data: dict, **kwargs) -> list[int]:
         """Update entities matching field criteria.
-        
+
         Args:
             data: Data to update
             **kwargs: Field filters to match entities for update
-            
+
         Returns:
             List of updated document IDs
         """
@@ -173,10 +173,10 @@ class BaseRepository[T]:
 
     def remove(self, **kwargs) -> list[int]:
         """Remove entities matching field criteria.
-        
+
         Args:
             **kwargs: Field filters to match entities for removal
-            
+
         Returns:
             List of removed document IDs
         """
@@ -185,10 +185,10 @@ class BaseRepository[T]:
 
     def exists(self, **kwargs) -> bool:
         """Check if entity exists matching field criteria.
-        
+
         Args:
             **kwargs: Field filters to match
-            
+
         Returns:
             True if entity exists, False otherwise
         """
@@ -197,10 +197,10 @@ class BaseRepository[T]:
 
     def count(self, **kwargs) -> int:
         """Count entities matching field criteria.
-        
+
         Args:
             **kwargs: Field filters to match
-            
+
         Returns:
             Number of matching entities
         """

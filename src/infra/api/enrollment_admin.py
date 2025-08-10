@@ -17,7 +17,7 @@ from infra.utils.pagination import Pagination
 
 class EnrollmentAdminAPI:
     """API layer for enrollment admin operations."""
-    
+
     TAGS = ["Enrollments Admin"]
     PREFIX = "/enrollments/admin"
 
@@ -28,7 +28,7 @@ class EnrollmentAdminAPI:
         dependencies: Sequence[params.Depends] | None = None,
     ) -> None:
         """Initialize API with FastAPI app and optional dependencies.
-        
+
         Args:
             app: FastAPI application instance
             dependencies: Optional dependencies for all routes
@@ -81,10 +81,10 @@ class EnrollmentAdminAPI:
     @staticmethod
     def _to_dto(e: Enrollment) -> EnrollmentDTO:
         """Convert domain enrollment to DTO.
-        
+
         Args:
             e: Domain enrollment object
-            
+
         Returns:
             Enrollment DTO
         """
@@ -106,16 +106,16 @@ class EnrollmentAdminAPI:
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[EnrollmentDTO]:
         """Get all enrollments with pagination.
-        
+
         Retrieves a paginated list of all enrollments in the system,
         including their status, timestamps, and age group information.
-        
+
         Args:
             request: HTTP request object
             uc: Enrollment admin use case dependency
             page: Page number (default: 1)
             page_size: Number of items per page (default: 100)
-            
+
         Returns:
             Paginated list of all enrollments
         """
@@ -138,17 +138,17 @@ class EnrollmentAdminAPI:
         uc: Annotated[EnrollmentAdminUseCase, Depends(provide_admin_use_case)],
     ) -> EnrollmentDTO:
         """Get enrollment by CPF.
-        
+
         Retrieves detailed enrollment information for a specific CPF,
         including all status history and timestamps.
-        
+
         Args:
             cpf: CPF to search for
             uc: Enrollment admin use case dependency
-            
+
         Returns:
             Enrollment data with full details
-            
+
         Raises:
             HTTPException: 404 if enrollment not found for the given CPF
         """
@@ -166,17 +166,17 @@ class EnrollmentAdminAPI:
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[EnrollmentDTO]:
         """List enrollments by age group with pagination.
-        
+
         Retrieves all enrollments that belong to a specific age group,
         useful for analyzing enrollment distribution across age ranges.
-        
+
         Args:
             request: HTTP request object
             name: Age group name to filter by
             uc: Enrollment admin use case dependency
             page: Page number (default: 1)
             page_size: Number of items per page (default: 100)
-            
+
         Returns:
             Paginated list of enrollments in the age group
         """
@@ -202,17 +202,17 @@ class EnrollmentAdminAPI:
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[EnrollmentDTO]:
         """List enrollments by student name with pagination.
-        
+
         Searches for enrollments by student name. Useful for finding
         all enrollments for students with similar names.
-        
+
         Args:
             request: HTTP request object
             name: Student name to filter by (minimum 1 character)
             uc: Enrollment admin use case dependency
             page: Page number (default: 1)
             page_size: Number of items per page (default: 100)
-            
+
         Returns:
             Paginated list of enrollments matching the name
         """
@@ -238,17 +238,17 @@ class EnrollmentAdminAPI:
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[EnrollmentDTO]:
         """List enrollments by status with pagination.
-        
+
         Filters enrollments by their current status. Useful for administrative
         tasks like reviewing approved or rejected enrollments.
-        
+
         Args:
             request: HTTP request object
             status_: Enrollment status to filter by (APPROVED or REJECTED)
             uc: Enrollment admin use case dependency
             page: Page number (default: 1)
             page_size: Number of items per page (default: 100)
-            
+
         Returns:
             Paginated list of enrollments with the specified status
         """

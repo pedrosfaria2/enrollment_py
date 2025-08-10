@@ -12,12 +12,11 @@ from settings import cfg
 
 
 class RabbitPublisher:
-    """RabbitMQ message publisher for enrollment events.
-    """
-    
+    """RabbitMQ message publisher for enrollment events."""
+
     def __init__(self, url: str | None = None, queue: str = cfg.QUEUE_NAME) -> None:
         """Initialize RabbitMQ publisher.
-        
+
         Args:
             url: RabbitMQ connection URL (default: from config)
             queue: Queue name to publish to (default: from config)
@@ -31,7 +30,7 @@ class RabbitPublisher:
 
     def _on_return(self, _ch, _method, _properties, _body) -> None:
         """Callback for unroutable messages.
-        
+
         Args:
             _ch: Channel that returned the message
             _method: Method frame
@@ -42,10 +41,10 @@ class RabbitPublisher:
 
     def _ensure_channel(self) -> BlockingChannel:
         """Ensure RabbitMQ channel is open and configured.
-        
+
         Creates new connection and channel if needed, declares queue,
         and sets up delivery confirmation.
-        
+
         Returns:
             Active RabbitMQ channel
         """
@@ -63,7 +62,7 @@ class RabbitPublisher:
 
     def _reset(self) -> None:
         """Reset connection and channel state.
-        
+
         Closes existing connection and resets internal state.
         """
         try:
@@ -76,13 +75,13 @@ class RabbitPublisher:
 
     def publish(self, payload: dict[str, Any]) -> None:
         """Publish message to RabbitMQ queue.
-        
+
         Serializes payload to JSON and publishes with delivery confirmation.
         Thread-safe operation with automatic connection management.
-        
+
         Args:
             payload: Message data to publish
-            
+
         Raises:
             RuntimeError: If message publishing fails or is unroutable
         """
@@ -107,7 +106,7 @@ class RabbitPublisher:
 
     def close(self) -> None:
         """Close RabbitMQ connection and cleanup resources.
-        
+
         Thread-safe operation that closes connection and resets state.
         """
         with self._lock:

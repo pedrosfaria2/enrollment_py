@@ -10,22 +10,26 @@ _CPF_RE = re.compile(r"^\d{3}\.\d{3}\.\d{3}-\d{2}$")
 
 class EnrollmentError(Exception):
     """Base exception for enrollment related errors."""
+
     ...
 
 
 class DuplicateEnrollmentError(EnrollmentError):
     """Raised when attempting to create a duplicate enrollment for the same CPF."""
+
     ...
 
 
 class IllegalTransitionError(EnrollmentError):
     """Raised when attempting an invalid status transition for an enrollment."""
+
     ...
 
 
 @dataclass(slots=True, frozen=True)
 class Enrollment:
     """Student enrollment with validation and status management."""
+
     name: str
     age: int
     cpf: str

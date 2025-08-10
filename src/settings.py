@@ -15,11 +15,11 @@ PROJECT_ROOT = Path(__file__).parent.parent
 
 class Config(BaseSettings):
     """Application configuration settings with environment variable support.
-    
+
     Uses Pydantic BaseSettings to load configuration from environment variables
     with fallback defaults. Supports database, messaging, and authentication settings.
     """
-    
+
     ENVIRONMENT: str = Field(
         default=os.getenv("ENVIRONMENT", "dev"),
         description="Project execution environment",
@@ -65,7 +65,7 @@ class Config(BaseSettings):
     @property
     def RABBITMQ_URL(self) -> str:  # noqa: N802
         """Construct RabbitMQ connection URL from individual components.
-        
+
         Returns:
             Complete AMQP URL with credentials and virtual host
         """
@@ -74,7 +74,7 @@ class Config(BaseSettings):
 
     def configure_logging(self):
         """Configure application logging with environment-specific levels.
-        
+
         Sets up Loguru logger with colored formatting and appropriate
         log levels based on environment (DEBUG for dev, INFO for prod).
         """
