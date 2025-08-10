@@ -3,22 +3,21 @@
 This module sets up and configures the FastAPI application with all routes,
 middleware, and dependencies through the APIBuilder.
 """
+
 import uvicorn
 
 from infra.api import APIBuilder
 from settings import cfg
 
-# Initialize API builder with configuration
 builder = APIBuilder(cfg)
 builder.build_stack()
 
-# Create FastAPI application instance
 app = builder()
 
 
 def main() -> None:
     """Start the FastAPI server with uvicorn.
-    
+
     Runs the enrollment API server on host 0.0.0.0:8003 with
     hot reload enabled for development.
     """
