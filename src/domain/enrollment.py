@@ -8,17 +8,28 @@ from infra.enumerators.enrollment import EnrollmentStatus
 _CPF_RE = re.compile(r"^\d{3}\.\d{3}\.\d{3}-\d{2}$")
 
 
-class EnrollmentError(Exception): ...
+class EnrollmentError(Exception):
+    """Base exception for enrollment related errors."""
+
+    ...
 
 
-class DuplicateEnrollmentError(EnrollmentError): ...
+class DuplicateEnrollmentError(EnrollmentError):
+    """Raised when attempting to create a duplicate enrollment for the same CPF."""
+
+    ...
 
 
-class IllegalTransitionError(EnrollmentError): ...
+class IllegalTransitionError(EnrollmentError):
+    """Raised when attempting an invalid status transition for an enrollment."""
+
+    ...
 
 
 @dataclass(slots=True, frozen=True)
 class Enrollment:
+    """Student enrollment with validation and status management."""
+
     name: str
     age: int
     cpf: str
@@ -29,6 +40,7 @@ class Enrollment:
     age_group_name: str | None = None
 
     def __post_init__(self) -> None:
+        """Validate age ≥ 0, CPF format, and enrolled_at when APPROVED."""
         if self.age < 0:
             raise ValueError("age must be non-negative")
         if not _CPF_RE.match(self.cpf):
@@ -48,12 +60,7 @@ class Enrollment:
         enrolled_at: int | None = None,
         age_group_name: str | None = None,
     ) -> Enrollment:
-        """
-        One-per-CPF + retry:
-        - None -> create final
-        - existing.APPROVED -> return existing (no-op)
-        - existing.REJECTED -> replace with new final
-        """
+        """Create/update enrollment with one-per-CPF policy. Returns existing if APPROVED."""
         candidate = Enrollment(
             name=name,
             age=age,

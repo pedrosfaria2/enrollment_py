@@ -12,20 +12,20 @@ T = TypeVar("T")
 
 
 class BaseRepository[T]:
-    """
-    Generic repository for TinyDB.
+    """Generic repository for TinyDB operations.
+
+    Provides common CRUD operations for domain entities using TinyDB storage.
     """
 
     def __init__(
         self, table: Table, *, factory: Callable[[Mapping[str, Any]], T], dumper: Callable[[T], dict[str, Any]]
     ):
-        """
-        Initialize the repository with a TinyDB table and a domain entity.
+        """Initialize repository with table and conversion functions.
 
         Args:
-            table: The TinyDB table instance.
-            factory: Callable that converts a TinyDB record into a domain entity.
-            dumper: Callable that converts a domain entity into a serialisable dict.
+            table: TinyDB table instance
+            factory: Function to convert database record to domain entity
+            dumper: Function to convert domain entity to database record
         """
         self.table = table
         self._factory = factory
@@ -33,13 +33,30 @@ class BaseRepository[T]:
         self.Query = Query()
 
     def _to_model(self, document: Document | None) -> T | None:
-        """Converts a TinyDB Document into a domain entity instance."""
+        """Convert TinyDB document to domain entity.
+
+        Args:
+            document: TinyDB document to convert
+
+        Returns:
+            Domain entity instance or None
+        """
         if document:
             return self._factory(document)
         return None
 
     def _build_query(self, **kwargs) -> QueryInstance:
-        """Builds a TinyDB Query object from keyword arguments."""
+        """Build TinyDB query from keyword arguments.
+
+        Args:
+            **kwargs: Field filters with optional operators (field__op=value)
+
+        Returns:
+            TinyDB query instance
+
+        Raises:
+            ValueError: If no arguments provided or unsupported operator used
+        """
         if not kwargs:
             raise ValueError("Cannot build a query with no keyword arguments.")
 
@@ -70,18 +87,39 @@ class BaseRepository[T]:
         return queries[0] if len(queries) == 1 else reduce(lambda a, b: a & b, queries)
 
     def insert(self, entity: T) -> T:
-        """Inserts a new entity into the database."""
+        """Insert new entity into database.
+
+        Args:
+            entity: Domain entity to insert
+
+        Returns:
+            The inserted entity
+        """
         with db_lock:
             self.table.insert(self._dumper(entity))
         return entity
 
     def get_by_id(self, doc_id: int) -> T | None:
-        """Retrieves an entity by its document ID."""
+        """Get entity by document ID.
+
+        Args:
+            doc_id: Document ID to search for
+
+        Returns:
+            Domain entity if found, None otherwise
+        """
         doc = self.table.get(doc_id=doc_id)
         return self._to_model(doc) if isinstance(doc, dict) else None
 
     def get_by_fields(self, **kwargs) -> T | None:
-        """Retrieves the first entity that matches the given fields."""
+        """Get first entity matching field criteria.
+
+        Args:
+            **kwargs: Field filters to match
+
+        Returns:
+            First matching entity or None
+        """
         if not kwargs:
             return None
         query = self._build_query(**kwargs)
@@ -89,13 +127,30 @@ class BaseRepository[T]:
         return self._to_model(doc) if isinstance(doc, dict) else None
 
     def get_all(self, offset: int = 0, limit: int = 100) -> list[T]:
-        """Retrieves all entities with pagination."""
+        """Get all entities with pagination.
+
+        Args:
+            offset: Number of records to skip (default: 0)
+            limit: Maximum number of records to return (default: 100)
+
+        Returns:
+            List of domain entities
+        """
         docs = self.table.all()
         paginated_docs = docs[offset : offset + limit]
         return [self._factory(doc) for doc in paginated_docs]
 
     def search_by_fields(self, offset: int = 0, limit: int = 100, **kwargs) -> list[T]:
-        """Retrieves all entities that match the given fields, with pagination."""
+        """Search entities by field criteria with pagination.
+
+        Args:
+            offset: Number of records to skip (default: 0)
+            limit: Maximum number of records to return (default: 100)
+            **kwargs: Field filters to match
+
+        Returns:
+            List of matching domain entities
+        """
         if not kwargs:
             return self.get_all(offset=offset, limit=limit)
         query = self._build_query(**kwargs)
@@ -104,22 +159,51 @@ class BaseRepository[T]:
         return [self._factory(doc) for doc in paginated_docs]
 
     def update(self, data: dict, **kwargs) -> list[int]:
-        """Updates entities matching the given fields."""
+        """Update entities matching field criteria.
+
+        Args:
+            data: Data to update
+            **kwargs: Field filters to match entities for update
+
+        Returns:
+            List of updated document IDs
+        """
         with db_lock:
             return self.table.update(data, self._build_query(**kwargs))
 
     def remove(self, **kwargs) -> list[int]:
-        """Removes entities matching the given fields."""
+        """Remove entities matching field criteria.
+
+        Args:
+            **kwargs: Field filters to match entities for removal
+
+        Returns:
+            List of removed document IDs
+        """
         with db_lock:
             return self.table.remove(self._build_query(**kwargs))
 
     def exists(self, **kwargs) -> bool:
-        """Checks if an entity with the given fields exists."""
+        """Check if entity exists matching field criteria.
+
+        Args:
+            **kwargs: Field filters to match
+
+        Returns:
+            True if entity exists, False otherwise
+        """
         query = self._build_query(**kwargs)
         return self.table.contains(query)
 
     def count(self, **kwargs) -> int:
-        """Counts entities that match the given fields."""
+        """Count entities matching field criteria.
+
+        Args:
+            **kwargs: Field filters to match
+
+        Returns:
+            Number of matching entities
+        """
         if not kwargs:
             return len(self.table)
         query = self._build_query(**kwargs)

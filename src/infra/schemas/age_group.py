@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class AgeGroup(BaseModel):
-    name: str = Field(..., description="Name of the age group")
-    min_age: Annotated[int, Field(ge=0, description="Minimum age for the group")]
-    max_age: Annotated[int, Field(ge=0, description="Maximum age for the group")]
+    name: str = Field(..., description="Unique name identifier for the age group")
+    min_age: Annotated[int, Field(ge=0, description="Minimum age (inclusive) for students in this group")]
+    max_age: Annotated[int, Field(ge=0, description="Maximum age (inclusive) for students in this group")]
 
     @model_validator(mode="after")
     def check_ages(self) -> Self:

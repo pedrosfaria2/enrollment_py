@@ -13,6 +13,8 @@ from infra.schemas.enrollment import EnrollmentCreate
 
 
 class EnrollmentAPI:
+    """API layer for enrollment operations."""
+
     TAGS = ["Enrollments"]
     PREFIX = "/enrollments"
 
@@ -22,6 +24,12 @@ class EnrollmentAPI:
         *,
         dependencies: Sequence[params.Depends] | None = None,
     ) -> None:
+        """Initialize API with FastAPI app and optional dependencies.
+
+        Args:
+            app: FastAPI application instance
+            dependencies: Optional dependencies for all routes
+        """
         self.router = APIRouter(
             dependencies=list(dependencies) if dependencies else None,
             route_class=LogAPIRoute,
@@ -30,6 +38,7 @@ class EnrollmentAPI:
         app.include_router(self.router, prefix=self.PREFIX, tags=list(self.TAGS))
 
     def _register_routes(self) -> None:
+        """Register all enrollment API routes."""
         self.router.add_api_route(
             "/",
             self.request_enrollment,
@@ -51,6 +60,20 @@ class EnrollmentAPI:
         dto: EnrollmentCreate,
         uc: Annotated[EnrollmentUseCase, Depends(provide_use_case)],
     ) -> None:
+        """Request enrollment processing.
+
+        Submits a new enrollment request for processing. The request is validated
+        for age group coverage and duplicate CPF checking before being queued.
+
+        Args:
+            dto: Enrollment creation data
+            uc: Enrollment use case dependency
+
+        Raises:
+            HTTPException: 422 if no age group covers the specified age
+            HTTPException: 409 if enrollment already approved for this CPF
+            HTTPException: 503 if enrollment service is unavailable
+        """
         try:
             await uc.request(name=dto.name, age=dto.age, cpf=dto.cpf)
             return None
@@ -66,6 +89,21 @@ class EnrollmentAPI:
         cpf: Annotated[str, Path(pattern=r"^\d{3}\.\d{3}\.\d{3}-\d{2}$")],
         uc: Annotated[EnrollmentUseCase, Depends(provide_use_case)],
     ) -> EnrollmentDTO:
+        """Get enrollment status by CPF.
+
+        Retrieves the current enrollment status for a given CPF.
+        CPF must be in the format XXX.XXX.XXX-XX.
+
+        Args:
+            cpf: CPF to search for (format: XXX.XXX.XXX-XX)
+            uc: Enrollment use case dependency
+
+        Returns:
+            Enrollment data with current status
+
+        Raises:
+            HTTPException: 404 if enrollment not found for the given CPF
+        """
         ent = await uc.status(cpf=cpf)
         if not ent:
             raise HTTPException(status_code=404, detail="enrollment not found")

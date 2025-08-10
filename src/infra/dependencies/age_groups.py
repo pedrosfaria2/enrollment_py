@@ -7,6 +7,14 @@ from infra.repositories.enrollment import EnrollmentRepository
 
 
 def provide_use_case() -> AgeGroupUseCase:
+    """Provide age group use case with all dependencies.
+
+    Creates and configures an AgeGroupUseCase with required repositories
+    and services for age group operations.
+
+    Returns:
+        Configured age group use case
+    """
     age_groups = AgeGroupRepository()
     enrollments = EnrollmentRepository()
     service = AgeGroupService(repo=age_groups, enrollments=enrollments)
