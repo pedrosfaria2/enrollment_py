@@ -6,6 +6,10 @@ FastAPI-based enrollment management system with RabbitMQ message processing.
 
 Complete API documentation available in the `documentation/` folder. Open `documentation/index.html` in a browser.
 
+Additional documentation includes:
+- `documentation/requirements/` - Application requirements
+- `documentation/diagrams/` - System diagrams and charts
+
 When running the application, interactive API documentation is available at:
 - `/docs` - Swagger UI
 - `/redoc` - ReDoc
