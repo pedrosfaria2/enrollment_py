@@ -16,6 +16,8 @@ from infra.utils.pagination import Pagination
 
 
 class EnrollmentAdminAPI:
+    """API layer for enrollment admin operations."""
+    
     TAGS = ["Enrollments Admin"]
     PREFIX = "/enrollments/admin"
 
@@ -25,6 +27,12 @@ class EnrollmentAdminAPI:
         *,
         dependencies: Sequence[params.Depends] | None = None,
     ) -> None:
+        """Initialize API with FastAPI app and optional dependencies.
+        
+        Args:
+            app: FastAPI application instance
+            dependencies: Optional dependencies for all routes
+        """
         self.router = APIRouter(
             dependencies=list(dependencies) if dependencies else None,
             route_class=LogAPIRoute,
@@ -33,6 +41,7 @@ class EnrollmentAdminAPI:
         app.include_router(self.router, prefix=self.PREFIX, tags=list(self.TAGS))
 
     def _register_routes(self) -> None:
+        """Register all enrollment admin API routes."""
         self.router.add_api_route(
             "/all",
             self.get_all,
@@ -71,6 +80,14 @@ class EnrollmentAdminAPI:
 
     @staticmethod
     def _to_dto(e: Enrollment) -> EnrollmentDTO:
+        """Convert domain enrollment to DTO.
+        
+        Args:
+            e: Domain enrollment object
+            
+        Returns:
+            Enrollment DTO
+        """
         return EnrollmentDTO(
             name=e.name,
             age=e.age,
@@ -88,6 +105,20 @@ class EnrollmentAdminAPI:
         page: Annotated[int, Query(ge=1)] = 1,
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[EnrollmentDTO]:
+        """Get all enrollments with pagination.
+        
+        Retrieves a paginated list of all enrollments in the system,
+        including their status, timestamps, and age group information.
+        
+        Args:
+            request: HTTP request object
+            uc: Enrollment admin use case dependency
+            page: Page number (default: 1)
+            page_size: Number of items per page (default: 100)
+            
+        Returns:
+            Paginated list of all enrollments
+        """
         offset = (page - 1) * page_size
         total = await uc.count_all()
         items = await uc.get_all(offset=offset, limit=page_size)
@@ -106,6 +137,21 @@ class EnrollmentAdminAPI:
         cpf: str,
         uc: Annotated[EnrollmentAdminUseCase, Depends(provide_admin_use_case)],
     ) -> EnrollmentDTO:
+        """Get enrollment by CPF.
+        
+        Retrieves detailed enrollment information for a specific CPF,
+        including all status history and timestamps.
+        
+        Args:
+            cpf: CPF to search for
+            uc: Enrollment admin use case dependency
+            
+        Returns:
+            Enrollment data with full details
+            
+        Raises:
+            HTTPException: 404 if enrollment not found for the given CPF
+        """
         e = await uc.get_by_cpf(cpf=cpf)
         if not e:
             raise HTTPException(status_code=404, detail="enrollment not found")
@@ -119,6 +165,21 @@ class EnrollmentAdminAPI:
         page: Annotated[int, Query(ge=1)] = 1,
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[EnrollmentDTO]:
+        """List enrollments by age group with pagination.
+        
+        Retrieves all enrollments that belong to a specific age group,
+        useful for analyzing enrollment distribution across age ranges.
+        
+        Args:
+            request: HTTP request object
+            name: Age group name to filter by
+            uc: Enrollment admin use case dependency
+            page: Page number (default: 1)
+            page_size: Number of items per page (default: 100)
+            
+        Returns:
+            Paginated list of enrollments in the age group
+        """
         offset = (page - 1) * page_size
         total = await uc.count_by_age_group(name=name)
         items = await uc.list_by_age_group(name=name, offset=offset, limit=page_size)
@@ -140,6 +201,21 @@ class EnrollmentAdminAPI:
         page: Annotated[int, Query(ge=1)] = 1,
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[EnrollmentDTO]:
+        """List enrollments by student name with pagination.
+        
+        Searches for enrollments by student name. Useful for finding
+        all enrollments for students with similar names.
+        
+        Args:
+            request: HTTP request object
+            name: Student name to filter by (minimum 1 character)
+            uc: Enrollment admin use case dependency
+            page: Page number (default: 1)
+            page_size: Number of items per page (default: 100)
+            
+        Returns:
+            Paginated list of enrollments matching the name
+        """
         offset = (page - 1) * page_size
         total = await uc.count_by_name(name=name)
         items = await uc.list_by_name(name=name, offset=offset, limit=page_size)
@@ -161,6 +237,21 @@ class EnrollmentAdminAPI:
         page: Annotated[int, Query(ge=1)] = 1,
         page_size: Annotated[int, Query(gt=0)] = 100,
     ) -> PageResult[EnrollmentDTO]:
+        """List enrollments by status with pagination.
+        
+        Filters enrollments by their current status. Useful for administrative
+        tasks like reviewing approved or rejected enrollments.
+        
+        Args:
+            request: HTTP request object
+            status_: Enrollment status to filter by (APPROVED or REJECTED)
+            uc: Enrollment admin use case dependency
+            page: Page number (default: 1)
+            page_size: Number of items per page (default: 100)
+            
+        Returns:
+            Paginated list of enrollments with the specified status
+        """
         offset = (page - 1) * page_size
         status_enum = EnrollmentStatus(status_)
         total = await uc.count_by_status(status=status_enum)
